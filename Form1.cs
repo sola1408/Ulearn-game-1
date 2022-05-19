@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -39,6 +39,7 @@ namespace WindowsFormsApp1
         public int scientistHealth = 100;
         public PlayGame()
         {
+            DoubleBuffered = true;
             InitializeComponent();
 
             timer1.Interval = 10;
@@ -66,6 +67,7 @@ namespace WindowsFormsApp1
                 //Думай как делать, ДУУУУУМААААЙ
                 int quiz = rnd.Next(0, 14);
                 question.Text = quizes[quiz, 0];
+
                 controllers[0].Text = quizes[quiz, 1];
                 controllers[1].Text = quizes[quiz, 2];
                 controllers[2].Text = quizes[quiz, 3];
@@ -81,34 +83,35 @@ namespace WindowsFormsApp1
         public void doQuiz(int i, Button[] controllers, string[,] quizes, int quiz,
             ProgressBar catHealthBar, ProgressBar scientistHealthBar, Label question)
         {
-            if(catHealthBar.Value == 0 || scientistHealthBar.Value == 0)
+            if(catHealthBar.Value  <= 0 || scientistHealthBar.Value <= 0)
             {
-                Controls.Clear();
-                var gameOver = new PictureBox()
-                {
-                    Size = new Size(512, 128),
-                    Location = new Point(275, 340)
-                };
-                System.IO.FileStream fs = new System.IO.FileStream(@"..\..\..\Sprites\GameOver.png", System.IO.FileMode.Open);
-                System.Drawing.Image img = System.Drawing.Image.FromStream(fs);
-                fs.Close();
-                gameOver.Image = img;
-                gameOver.BackColor = Color.Transparent;
-                Controls.Add(gameOver);
+                EndGame();
+                return;
             }
             if (controllers[i - 1].Text == quizes[quiz, 5])
             {
                 scientistHealth = scientistHealth - 10;
+                if (scientistHealth <= 0)
+                {
+                    EndGame();
+                    return;
+                }
                 scientistHealthBar.Value = scientistHealth;
             }
             //А 7 строк ниже отвечают за урон противнику, тоже тема рабочая
-            Random rnd = new Random();
-            int a = rnd.Next(0, 1);
-            if (10 * a > 0)
+            
+            //int a = rnd.Next(0, 1);
+            else //(a == 0)
             {
                 catHealth = catHealth - 10;
+                if (catHealth <= 0)
+                {
+                    EndGame();
+                    return;
+                }
                 catHealthBar.Value = catHealth;
             }
+            var rnd = new Random();
             //Хуйню ниже желательно переделать. проблема где-то в ней
             quiz = rnd.Next(0, 14);
             question.Text = quizes[quiz, 0];
@@ -129,6 +132,30 @@ namespace WindowsFormsApp1
             Controls.Clear();
             Controls.Add(createHero(new Point(415, 635), catSprite, "Catgirl"));
             Controls.Add(createHero(new Point(415, 0), "Angry scientist1.png", "Angry Scientist"));
+        }
+
+        public void EndGame()
+        {
+            Controls.Clear();
+            //var gameOver = new PictureBox()
+            //{
+            //    Size = new Size(512, 128),
+            //    Location = new Point(275, 340)
+            //};
+            //System.IO.FileStream fs = new System.IO.FileStream(@"..\..\..\Sprites\GameOver.png", System.IO.FileMode.Open);
+            //System.Drawing.Image img = System.Drawing.Image.FromStream(fs);
+            ////fs.Close();
+            //gameOver.Image = img;
+            //gameOver.BackColor = Color.Transparent;
+            //Controls.Add(gameOver);
+            const string message = "Game is over";
+            const string caption = "Quiz";
+            var result = MessageBox.Show(message, caption,
+                                         MessageBoxButtons.OK,
+                                         MessageBoxIcon.Question);
+            timer1.Stop();
+            if (result == DialogResult.OK)
+                Application.Exit();
         }
         
         public PictureBox createHero(Point location, String sprite, string name)
@@ -191,6 +218,6 @@ namespace WindowsFormsApp1
             health.ForeColor = Color.Red;
             return health;
         }
-    }
 
+    }
 }
