@@ -39,8 +39,9 @@ namespace WindowsFormsApp1
         public int scientistHealth = 100;
         public PlayGame()
         {
+            //Если это не поможет, работаем над TODO
+            this.DoubleBuffered = true;
             InitializeComponent();
-
             timer1.Interval = 10;
             timer1.Tick += Timer1_Tick;
         }
@@ -53,28 +54,28 @@ namespace WindowsFormsApp1
         private void playButton_MouseClick(object sender, MouseEventArgs e)
         {
                 CreateCatGame("Cat sprite.png");
+                //TODO: этот метод каждый раз по клику инициализирует новый массив кнопок и накладывает их друг на друга, нужно использовать одни и те же кнопки.
                 controllers = CreateGame();
+                //TODO: Аналогично - создание нового прогресс-бара на каждый клик. Нужно юзать один прогресс бар.
                 var catHealthBar = CreateHealth(new Point(430, 600));
                 catHealthBar.Value = 100;
                 Controls.Add(catHealthBar);
+                //TODO: Аналогично
                 var scientistHealthBar = CreateHealth(new Point(430, 200));
                 scientistHealthBar.Value = 100;
                 Controls.Add(scientistHealthBar);
-                var question = CreateLabel(new Size(530, 90), new Point(258, 264));
+                //TODO: Аналогично
+                var question = CreateLabel(new Size(530, 90), new Point(258, 264)); 
                 Controls.Add(question);
                 Random rnd = new Random();
                 //Думай как делать, ДУУУУУМААААЙ
                 int quiz = rnd.Next(0, 14);
                 question.Text = quizes[quiz, 0];
-                controllers[0].Text = quizes[quiz, 1];
-                controllers[1].Text = quizes[quiz, 2];
-                controllers[2].Text = quizes[quiz, 3];
-                controllers[3].Text = quizes[quiz, 4];
-
-                controllers[0].Click += (sender, args) => doQuiz(1, controllers, quizes, quiz, catHealthBar, scientistHealthBar, question);
-                controllers[1].Click += (sender, args) => doQuiz(2, controllers, quizes, quiz, catHealthBar, scientistHealthBar, question);
-                controllers[2].Click += (sender, args) => doQuiz(3, controllers, quizes, quiz, catHealthBar, scientistHealthBar, question);
-                controllers[3].Click += (sender, args) => doQuiz(4, controllers, quizes, quiz, catHealthBar, scientistHealthBar, question);
+                for (var i = 0; i < 4; i++) 
+                {
+                    controllers[i].Text = quizes[quiz, i + 1];
+                    controllers[i].Click += (sender, args) => doQuiz(i + 1, controllers, quizes, quiz, catHealthBar, scientistHealthBar, question);
+                }
         }
 
 
